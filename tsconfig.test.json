@@ -4,5 +4,6 @@
     "rootDir": ".",
     "noUnusedLocals": false
   },
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

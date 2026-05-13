@@ -19,7 +19,7 @@ export function buildAuditLogQuery(cutoff: Date, phrases: string[], includeBots:
   const parts: string[] = [`created:>=${dateStr}`];
 
   if (phrases.length === 1) {
-    parts.push(phrases[0] as string);
+    parts.push(phrases[0]);
   } else if (phrases.length > 1) {
     parts.push(`(${phrases.join(' OR ')})`);
   }
