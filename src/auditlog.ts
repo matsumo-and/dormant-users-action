@@ -13,11 +13,7 @@ export function getCutoffDate(days: number): Date {
   return date;
 }
 
-export function buildAuditLogQuery(
-  cutoff: Date,
-  phrases: string[],
-  includeBots: boolean,
-): string {
+export function buildAuditLogQuery(cutoff: Date, phrases: string[], includeBots: boolean): string {
   const dateStr = cutoff.toISOString().split('T')[0];
 
   const parts: string[] = [`created:>=${dateStr}`];

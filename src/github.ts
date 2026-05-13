@@ -60,10 +60,7 @@ export async function verifyToken(token: string): Promise<void> {
   }
 }
 
-export async function ghApiList<T>(
-  endpoint: string,
-  options: GhApiListOptions = {},
-): Promise<T[]> {
+export async function ghApiList<T>(endpoint: string, options: GhApiListOptions = {}): Promise<T[]> {
   const { env = {}, fields = {} } = options;
 
   const args: string[] = ['api', endpoint, '--paginate', '--jq', '.[]'];
@@ -94,7 +91,9 @@ function parseNdJson<T>(raw: string): T[] {
       try {
         return JSON.parse(line) as T;
       } catch {
-        throw new Error(`Failed to parse audit log line ${(index + 1).toString()}: ${line.slice(0, 120)}`);
+        throw new Error(
+          `Failed to parse audit log line ${(index + 1).toString()}: ${line.slice(0, 120)}`,
+        );
       }
     });
 }

@@ -87,9 +87,7 @@ describe('InputSchema — phrases', () => {
   });
 
   it('rejects phrases containing created:', () => {
-    expect(
-      InputSchema.safeParse({ ...BASE, phrases: 'created:>=2020-01-01' }).success,
-    ).toBe(false);
+    expect(InputSchema.safeParse({ ...BASE, phrases: 'created:>=2020-01-01' }).success).toBe(false);
   });
 
   it('rejects phrases containing actor:', () => {
@@ -97,18 +95,16 @@ describe('InputSchema — phrases', () => {
   });
 
   it('rejects phrases containing actor_is_bot:', () => {
-    expect(
-      InputSchema.safeParse({ ...BASE, phrases: 'actor_is_bot:true' }).success,
-    ).toBe(false);
+    expect(InputSchema.safeParse({ ...BASE, phrases: 'actor_is_bot:true' }).success).toBe(false);
   });
 
   it('rejects phrases with shell metacharacters', () => {
-    expect(
-      InputSchema.safeParse({ ...BASE, phrases: 'action:repo.push; rm -rf /' }).success,
-    ).toBe(false);
-    expect(
-      InputSchema.safeParse({ ...BASE, phrases: 'action:repo.push && echo hi' }).success,
-    ).toBe(false);
+    expect(InputSchema.safeParse({ ...BASE, phrases: 'action:repo.push; rm -rf /' }).success).toBe(
+      false,
+    );
+    expect(InputSchema.safeParse({ ...BASE, phrases: 'action:repo.push && echo hi' }).success).toBe(
+      false,
+    );
     expect(
       InputSchema.safeParse({ ...BASE, phrases: 'action:repo.push | tee /tmp/x' }).success,
     ).toBe(false);

@@ -5,9 +5,7 @@ const FIXED = new Date('2026-01-13T00:00:00.000Z');
 
 describe('buildAuditLogQuery', () => {
   it('builds minimal query with no phrases, bots excluded', () => {
-    expect(buildAuditLogQuery(FIXED, [], false)).toBe(
-      'created:>=2026-01-13 actor_is_bot:false',
-    );
+    expect(buildAuditLogQuery(FIXED, [], false)).toBe('created:>=2026-01-13 actor_is_bot:false');
   });
 
   it('omits actor_is_bot when includeBots=true', () => {
