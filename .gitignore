@@ -80,8 +80,8 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
-.output
+# dist/ is intentionally tracked: the GitHub Actions runner requires dist/index.js
+# .output
 
 # Gatsby files
 .cache/

@@ -1,0 +1,74 @@
+name: Detect Dormant Users
+
+on:
+  # Run on the first day of every month at 09:00 UTC
+  schedule:
+    - cron: '0 9 1 * *'
+  # Allow manual runs with optional overrides
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Days to look back in the audit log'
+        default: '90'
+        required: false
+      debug:
+        description: 'Enable debug logging'
+        default: 'false'
+        required: false
+        type: choice
+        options: ['false', 'true']
+
+jobs:
+  detect-dormant-users:
+    name: Detect Dormant Users
+    runs-on: ubuntu-latest
+
+    # Minimum permissions required — do not grant write access unless you
+    # intend to automate downstream actions (e.g. removing members).
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Dormant Users
+        id: dormant
+        uses: matdumo-and/dormant-users-action@v1
+        with:
+          org: ${{ github.repository_owner }}
+          # Use a PAT or fine-grained token with read:org + read:audit_log.
+          # Store it as a repository or organization secret.
+          token: ${{ secrets.ORG_AUDIT_LOG_TOKEN }}
+          days: ${{ inputs.days || '90' }}
+          include-bots: 'false'
+          debug: ${{ inputs.debug || 'false' }}
+          # Add audit log phrase filters (OR-combined).
+          # Any matching event marks a user as active.
+          phrases: |
+            action:repo.push
+            action:pull_request.opened
+            action:issues.opened
+            action:org.invite_member
+
+      # ── Summary ──────────────────────────────────────────────────────────
+      - name: Print summary
+        run: |
+          echo "### Dormant Users Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Dormant count:** ${{ steps.dormant.outputs.dormant-users-count }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```csv' >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.dormant.outputs.dormant-users-csv }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      # ── Artifact ─────────────────────────────────────────────────────────
+      - name: Write JSON report
+        run: echo '${{ steps.dormant.outputs.dormant-users-json }}' > dormant-users.json
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dormant-users-report
+          path: dormant-users.json
+          retention-days: 90
