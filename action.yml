@@ -1,5 +1,5 @@
 name: 'Dormant Users Action'
-description: 'Detects dormant GitHub organization members by cross-referencing the Members API with Audit Log activity — minimal API calls, no per-user queries.'
+description: 'Detects dormant GitHub org members via Members + Audit Log APIs — no per-user queries.'
 author: 'matdumo-and'
 
 inputs:
