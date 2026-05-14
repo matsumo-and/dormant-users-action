@@ -31251,12 +31251,12 @@ async function checkGhCli() {
 }
 async function verifyToken(token) {
   try {
-    await execa("gh", ["api", "/user"], {
+    await execa("gh", ["api", "/rate_limit"], {
       env: { ...process.env, GH_TOKEN: token }
     });
   } catch (err) {
     const e = err;
-    throw new GhApiError("/user", e.stderr ?? "", e.exitCode ?? -1);
+    throw new GhApiError("/rate_limit", e.stderr ?? "", e.exitCode ?? -1);
   }
 }
 async function ghApiList(endpoint, options = {}) {

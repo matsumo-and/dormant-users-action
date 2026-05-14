@@ -50,13 +50,15 @@ export async function checkGhCli(): Promise<void> {
 }
 
 export async function verifyToken(token: string): Promise<void> {
+  // /rate_limit works for PATs, OAuth tokens, and GitHub App installation
+  // tokens alike. /user returns 403 for App tokens so cannot be used here.
   try {
-    await execa('gh', ['api', '/user'], {
+    await execa('gh', ['api', '/rate_limit'], {
       env: { ...process.env, GH_TOKEN: token },
     });
   } catch (err: unknown) {
     const e = err as { stderr?: string; exitCode?: number };
-    throw new GhApiError('/user', e.stderr ?? '', e.exitCode ?? -1);
+    throw new GhApiError('/rate_limit', e.stderr ?? '', e.exitCode ?? -1);
   }
 }
 
