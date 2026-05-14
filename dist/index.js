@@ -31260,11 +31260,8 @@ async function verifyToken(token) {
   }
 }
 async function ghApiList(endpoint, options = {}) {
-  const { env = {}, fields = {} } = options;
+  const { env = {} } = options;
   const args = ["api", endpoint, "--paginate", "--jq", ".[]"];
-  for (const [key, value] of Object.entries(fields)) {
-    args.push("-f", `${key}=${value}`);
-  }
   let stdout;
   try {
     const result = await execa("gh", args, {
@@ -31338,9 +31335,9 @@ function buildAuditLogQuery(cutoff, phrases) {
   return parts.join(" ");
 }
 async function fetchActiveActors(org, token, query) {
-  const events = await ghApiList(`/orgs/${org}/audit-log`, {
-    env: { GH_TOKEN: token },
-    fields: { phrase: query }
+  const endpoint = `/orgs/${org}/audit-log?phrase=${encodeURIComponent(query)}`;
+  const events = await ghApiList(endpoint, {
+    env: { GH_TOKEN: token }
   });
   const actors = /* @__PURE__ */ new Set();
   for (const event of events) {

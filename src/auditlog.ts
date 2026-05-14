@@ -32,9 +32,11 @@ export async function fetchActiveActors(
   token: string,
   query: string,
 ): Promise<Set<string>> {
-  const events = await ghApiList<AuditLogEvent>(`/orgs/${org}/audit-log`, {
+  // Embed phrase as a URL query parameter directly. Using -f phrase=... sends
+  // it as a request body field which causes 404 on this GET endpoint.
+  const endpoint = `/orgs/${org}/audit-log?phrase=${encodeURIComponent(query)}`;
+  const events = await ghApiList<AuditLogEvent>(endpoint, {
     env: { GH_TOKEN: token },
-    fields: { phrase: query },
   });
 
   const actors = new Set<string>();

@@ -2,7 +2,6 @@ import { execa } from 'execa';
 
 export type GhApiListOptions = {
   env?: Record<string, string>;
-  fields?: Record<string, string>;
 };
 
 export class GhApiError extends Error {
@@ -63,12 +62,9 @@ export async function verifyToken(token: string): Promise<void> {
 }
 
 export async function ghApiList<T>(endpoint: string, options: GhApiListOptions = {}): Promise<T[]> {
-  const { env = {}, fields = {} } = options;
+  const { env = {} } = options;
 
   const args: string[] = ['api', endpoint, '--paginate', '--jq', '.[]'];
-  for (const [key, value] of Object.entries(fields)) {
-    args.push('-f', `${key}=${value}`);
-  }
 
   let stdout: string;
   try {
