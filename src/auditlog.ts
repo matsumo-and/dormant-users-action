@@ -13,7 +13,7 @@ export function getCutoffDate(days: number): Date {
   return date;
 }
 
-export function buildAuditLogQuery(cutoff: Date, phrases: string[], includeBots: boolean): string {
+export function buildAuditLogQuery(cutoff: Date, phrases: string[]): string {
   const dateStr = cutoff.toISOString().split('T')[0];
 
   const parts: string[] = [`created:>=${dateStr}`];
@@ -22,10 +22,6 @@ export function buildAuditLogQuery(cutoff: Date, phrases: string[], includeBots:
     parts.push(phrases[0]);
   } else if (phrases.length > 1) {
     parts.push(`(${phrases.join(' OR ')})`);
-  }
-
-  if (!includeBots) {
-    parts.push('actor_is_bot:false');
   }
 
   return parts.join(' ');

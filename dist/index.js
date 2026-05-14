@@ -31327,16 +31327,13 @@ function getCutoffDate(days) {
   date.setHours(0, 0, 0, 0);
   return date;
 }
-function buildAuditLogQuery(cutoff, phrases, includeBots) {
+function buildAuditLogQuery(cutoff, phrases) {
   const dateStr = cutoff.toISOString().split("T")[0];
   const parts = [`created:>=${dateStr}`];
   if (phrases.length === 1) {
     parts.push(phrases[0]);
   } else if (phrases.length > 1) {
     parts.push(`(${phrases.join(" OR ")})`);
-  }
-  if (!includeBots) {
-    parts.push("actor_is_bot:false");
   }
   return parts.join(" ");
 }
@@ -31381,7 +31378,7 @@ async function run() {
     await checkGhCli();
     await verifyToken(token);
     const cutoff = getCutoffDate(days);
-    const query = buildAuditLogQuery(cutoff, phrases, includeBots);
+    const query = buildAuditLogQuery(cutoff, phrases);
     if (debug) {
       core3.startGroup("dormant-users-action: configuration");
       core3.info(`Organization  : ${org}`);

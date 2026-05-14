@@ -14,7 +14,7 @@ async function run(): Promise<void> {
     await verifyToken(token);
 
     const cutoff = getCutoffDate(days);
-    const query = buildAuditLogQuery(cutoff, phrases, includeBots);
+    const query = buildAuditLogQuery(cutoff, phrases);
 
     if (debug) {
       core.startGroup('dormant-users-action: configuration');
