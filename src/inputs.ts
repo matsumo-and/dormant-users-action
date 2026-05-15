@@ -1,6 +1,12 @@
 import * as core from '@actions/core';
 import { InputSchema, ValidatedInputs } from './validation.js';
 
+/**
+ * Reads all `@actions/core` inputs, validates them through {@link InputSchema},
+ * and returns the typed result.
+ *
+ * @throws {Error} If any input fails validation, with a formatted list of issues.
+ */
 export function getInputs(): ValidatedInputs {
   const raw = {
     org: core.getInput('org', { required: true }),

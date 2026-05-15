@@ -1,15 +1,25 @@
 import * as core from '@actions/core';
 import { execa } from 'execa';
 
+/** Options for {@link ghApiList}. */
 export type GhApiListOptions = {
+  /** Additional environment variables forwarded to the `gh` process. */
   env?: Record<string, string>;
+  /** When `true`, emits `core.info` lines describing the API call and result count. */
   debug?: boolean;
 };
 
+/**
+ * Thrown when a `gh api` invocation exits with a non-zero status.
+ * The message is human-readable and tailored to common HTTP error codes.
+ */
 export class GhApiError extends Error {
   constructor(
+    /** The API endpoint path that failed. */
     public readonly endpoint: string,
+    /** Raw stderr output from the `gh` process. */
     public readonly stderr: string,
+    /** Process exit code returned by `gh`. */
     public readonly exitCode: number,
   ) {
     super(GhApiError.describe(endpoint, stderr, exitCode));
@@ -38,6 +48,10 @@ export class GhApiError extends Error {
   }
 }
 
+/**
+ * Verifies that the GitHub CLI (`gh`) is installed and reachable in `PATH`.
+ * @throws {Error} If `gh` is not found or exits with a non-zero status.
+ */
 export async function checkGhCli(debug?: boolean): Promise<void> {
   try {
     const result = await execa('gh', ['--version']);
@@ -53,6 +67,14 @@ export async function checkGhCli(debug?: boolean): Promise<void> {
   }
 }
 
+/**
+ * Confirms that `token` is accepted by the GitHub API via `GET /rate_limit`.
+ *
+ * Uses `/rate_limit` rather than `/user` because the latter returns 403 for
+ * GitHub App installation tokens.
+ *
+ * @throws {GhApiError} If the token is invalid or the request fails.
+ */
 export async function verifyToken(token: string, debug?: boolean): Promise<void> {
   // /rate_limit works for PATs, OAuth tokens, and GitHub App installation
   // tokens alike. /user returns 403 for App tokens so cannot be used here.
@@ -84,6 +106,15 @@ export async function verifyToken(token: string, debug?: boolean): Promise<void>
   }
 }
 
+/**
+ * Calls `gh api <endpoint> --paginate --jq '.[]'` and returns all items as a
+ * typed array. Each NDJSON line emitted by `--paginate` is parsed individually.
+ *
+ * @template T - Expected shape of each item in the response array.
+ * @param endpoint - GitHub REST API path (e.g. `/orgs/my-org/members`).
+ * @throws {GhApiError} If `gh` exits with a non-zero status.
+ * @throws {Error} If any NDJSON line cannot be parsed as JSON.
+ */
 export async function ghApiList<T>(endpoint: string, options: GhApiListOptions = {}): Promise<T[]> {
   const { env = {}, debug } = options;
 

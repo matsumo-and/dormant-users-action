@@ -20,6 +20,10 @@ function parsePhrases(raw: string | undefined): string[] {
     .filter((line) => line.length > 0);
 }
 
+/**
+ * Zod schema that validates and coerces raw GitHub Actions input strings into
+ * their typed counterparts. Phrase injection is blocked via {@link isSafePhrase}.
+ */
 export const InputSchema = z.object({
   org: z.string().min(1, 'org must be a non-empty string'),
 
@@ -59,5 +63,8 @@ export const InputSchema = z.object({
     .transform(parsePhrases),
 });
 
+/** Typed inputs after validation and transformation by {@link InputSchema}. */
 export type ValidatedInputs = z.output<typeof InputSchema>;
+
+/** Raw string inputs as received from `@actions/core` before validation. */
 export type RawInputs = z.input<typeof InputSchema>;

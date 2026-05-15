@@ -1,12 +1,21 @@
 import * as core from '@actions/core';
 import { ghApiList } from './github.js';
 
+/** Minimal shape of a GitHub audit log event used by this action. */
 export type AuditLogEvent = {
+  /** Login of the user who performed the action. */
   actor?: string;
+  /** Audit log action identifier (e.g. `"repo.create"`). */
   action?: string;
+  /** Unix timestamp (ms) when the event occurred. */
   created_at?: number;
 };
 
+/**
+ * Returns midnight (UTC) of the date that is `days` calendar days before today.
+ *
+ * @param days - Number of days to look back (must be ≥ 1).
+ */
 export function getCutoffDate(days: number): Date {
   const date = new Date();
   date.setDate(date.getDate() - days);
@@ -14,6 +23,15 @@ export function getCutoffDate(days: number): Date {
   return date;
 }
 
+/**
+ * Builds a GitHub audit log search phrase for the `GET /orgs/:org/audit-log`
+ * endpoint, combining a `created:>=YYYY-MM-DD` filter with any caller-supplied
+ * phrases joined by `OR`.
+ *
+ * @param cutoff - Earliest date to include; time component is ignored.
+ * @param phrases - Pre-validated search phrases (may be empty).
+ * @returns A URL-safe audit log query string.
+ */
 export function buildAuditLogQuery(cutoff: Date, phrases: string[]): string {
   const dateStr = cutoff.toISOString().split('T')[0];
 
@@ -28,6 +46,16 @@ export function buildAuditLogQuery(cutoff: Date, phrases: string[]): string {
   return parts.join(' ');
 }
 
+/**
+ * Queries the GitHub organization audit log and returns the set of unique
+ * actor logins that appear in any matching event.
+ *
+ * @param org - GitHub organization login.
+ * @param token - GitHub token with `read:audit_log` scope.
+ * @param query - Audit log search phrase built by {@link buildAuditLogQuery}.
+ * @returns Set of login strings for users who had at least one audit log event.
+ * @throws {GhApiError} If the audit log API request fails.
+ */
 export async function fetchActiveActors(
   org: string,
   token: string,
