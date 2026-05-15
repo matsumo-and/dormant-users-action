@@ -17600,12 +17600,12 @@ var require_lib = __commonJS({
             throw new Error("Client has already been disposed.");
           }
           const parsedUrl = new URL(requestUrl);
-          let info2 = this._prepareRequest(verb, parsedUrl, headers);
+          let info5 = this._prepareRequest(verb, parsedUrl, headers);
           const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb) ? this._maxRetries + 1 : 1;
           let numTries = 0;
           let response;
           do {
-            response = yield this.requestRaw(info2, data);
+            response = yield this.requestRaw(info5, data);
             if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
               let authenticationHandler;
               for (const handler of this.handlers) {
@@ -17615,7 +17615,7 @@ var require_lib = __commonJS({
                 }
               }
               if (authenticationHandler) {
-                return authenticationHandler.handleAuthentication(this, info2, data);
+                return authenticationHandler.handleAuthentication(this, info5, data);
               } else {
                 return response;
               }
@@ -17638,8 +17638,8 @@ var require_lib = __commonJS({
                   }
                 }
               }
-              info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
-              response = yield this.requestRaw(info2, data);
+              info5 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+              response = yield this.requestRaw(info5, data);
               redirectsRemaining--;
             }
             if (!response.message.statusCode || !HttpResponseRetryCodes.includes(response.message.statusCode)) {
@@ -17668,7 +17668,7 @@ var require_lib = __commonJS({
        * @param info
        * @param data
        */
-      requestRaw(info2, data) {
+      requestRaw(info5, data) {
         return __awaiter(this, void 0, void 0, function* () {
           return new Promise((resolve, reject) => {
             function callbackForResult(err, res) {
@@ -17680,7 +17680,7 @@ var require_lib = __commonJS({
                 resolve(res);
               }
             }
-            this.requestRawWithCallback(info2, data, callbackForResult);
+            this.requestRawWithCallback(info5, data, callbackForResult);
           });
         });
       }
@@ -17690,12 +17690,12 @@ var require_lib = __commonJS({
        * @param data
        * @param onResult
        */
-      requestRawWithCallback(info2, data, onResult) {
+      requestRawWithCallback(info5, data, onResult) {
         if (typeof data === "string") {
-          if (!info2.options.headers) {
-            info2.options.headers = {};
+          if (!info5.options.headers) {
+            info5.options.headers = {};
           }
-          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+          info5.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
         }
         let callbackCalled = false;
         function handleResult3(err, res) {
@@ -17704,7 +17704,7 @@ var require_lib = __commonJS({
             onResult(err, res);
           }
         }
-        const req = info2.httpModule.request(info2.options, (msg) => {
+        const req = info5.httpModule.request(info5.options, (msg) => {
           const res = new HttpClientResponse(msg);
           handleResult3(void 0, res);
         });
@@ -17716,7 +17716,7 @@ var require_lib = __commonJS({
           if (socket) {
             socket.end();
           }
-          handleResult3(new Error(`Request timeout: ${info2.options.path}`));
+          handleResult3(new Error(`Request timeout: ${info5.options.path}`));
         });
         req.on("error", function(err) {
           handleResult3(err);
@@ -17752,27 +17752,27 @@ var require_lib = __commonJS({
         return this._getProxyAgentDispatcher(parsedUrl, proxyUrl);
       }
       _prepareRequest(method, requestUrl, headers) {
-        const info2 = {};
-        info2.parsedUrl = requestUrl;
-        const usingSsl = info2.parsedUrl.protocol === "https:";
-        info2.httpModule = usingSsl ? https : http;
+        const info5 = {};
+        info5.parsedUrl = requestUrl;
+        const usingSsl = info5.parsedUrl.protocol === "https:";
+        info5.httpModule = usingSsl ? https : http;
         const defaultPort = usingSsl ? 443 : 80;
-        info2.options = {};
-        info2.options.host = info2.parsedUrl.hostname;
-        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
-        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
-        info2.options.method = method;
-        info2.options.headers = this._mergeHeaders(headers);
+        info5.options = {};
+        info5.options.host = info5.parsedUrl.hostname;
+        info5.options.port = info5.parsedUrl.port ? parseInt(info5.parsedUrl.port) : defaultPort;
+        info5.options.path = (info5.parsedUrl.pathname || "") + (info5.parsedUrl.search || "");
+        info5.options.method = method;
+        info5.options.headers = this._mergeHeaders(headers);
         if (this.userAgent != null) {
-          info2.options.headers["user-agent"] = this.userAgent;
+          info5.options.headers["user-agent"] = this.userAgent;
         }
-        info2.options.agent = this._getAgent(info2.parsedUrl);
+        info5.options.agent = this._getAgent(info5.parsedUrl);
         if (this.handlers) {
           for (const handler of this.handlers) {
-            handler.prepareRequest(info2.options);
+            handler.prepareRequest(info5.options);
           }
         }
-        return info2;
+        return info5;
       }
       _mergeHeaders(headers) {
         if (this.requestOptions && this.requestOptions.headers) {
@@ -19762,10 +19762,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       (0, command_1.issueCommand)("notice", (0, utils_1.toCommandProperties)(properties), message instanceof Error ? message.toString() : message);
     }
     exports.notice = notice;
-    function info2(message) {
+    function info5(message) {
       process.stdout.write(message + os.EOL);
     }
-    exports.info = info2;
+    exports.info = info5;
     function startGroup2(name) {
       (0, command_1.issue)("group", name);
     }
@@ -19907,11 +19907,11 @@ var require_isexe = __commonJS({
   "node_modules/.pnpm/isexe@2.0.0/node_modules/isexe/index.js"(exports, module) {
     "use strict";
     var fs = __require("fs");
-    var core4;
+    var core7;
     if (process.platform === "win32" || global.TESTING_WINDOWS) {
-      core4 = require_windows();
+      core7 = require_windows();
     } else {
-      core4 = require_mode();
+      core7 = require_mode();
     }
     module.exports = isexe;
     isexe.sync = sync;
@@ -19934,7 +19934,7 @@ var require_isexe = __commonJS({
           });
         });
       }
-      core4(path6, options || {}, function(er, is) {
+      core7(path6, options || {}, function(er, is) {
         if (er) {
           if (er.code === "EACCES" || options && options.ignoreErrors) {
             er = null;
@@ -19946,7 +19946,7 @@ var require_isexe = __commonJS({
     }
     function sync(path6, options) {
       try {
-        return core4.sync(path6, options || {});
+        return core7.sync(path6, options || {});
       } catch (er) {
         if (options && options.ignoreErrors || er.code === "EACCES") {
           return false;
@@ -20329,7 +20329,7 @@ var require_cross_spawn = __commonJS({
 });
 
 // src/index.ts
-var core3 = __toESM(require_core(), 1);
+var core6 = __toESM(require_core(), 1);
 
 // src/inputs.ts
 var core = __toESM(require_core(), 1);
@@ -24430,6 +24430,9 @@ ${errors}`);
   }
   return result.data;
 }
+
+// src/github.ts
+var core2 = __toESM(require_core(), 1);
 
 // node_modules/.pnpm/is-plain-obj@4.1.0/node_modules/is-plain-obj/index.js
 function isPlainObject(value) {
@@ -31240,28 +31243,50 @@ var GhApiError = class _GhApiError extends Error {
     return `gh api ${endpoint} failed (exit ${exitCode.toString()}): ${stderr}`;
   }
 };
-async function checkGhCli() {
+async function checkGhCli(debug) {
   try {
-    await execa("gh", ["--version"]);
+    const result = await execa("gh", ["--version"]);
+    if (debug) {
+      core2.info(`[debug] gh CLI found: ${result.stdout.split("\n")[0]}`);
+    }
   } catch {
     throw new Error(
       "GitHub CLI (gh) is not installed or not in PATH. GitHub-hosted runners include gh by default; for self-hosted runners install it from https://cli.github.com."
     );
   }
 }
-async function verifyToken(token) {
+async function verifyToken(token, debug) {
   try {
-    await execa("gh", ["api", "/rate_limit"], {
+    const result = await execa("gh", ["api", "/rate_limit"], {
       env: { ...process.env, GH_TOKEN: token }
     });
+    if (debug) {
+      try {
+        const data = JSON.parse(result.stdout);
+        const rate = data.rate;
+        if (rate) {
+          const resetAt = new Date(rate.reset * 1e3).toISOString();
+          core2.info(
+            `[debug] Token verified \u2014 rate limit: ${rate.remaining.toString()}/${rate.limit.toString()} remaining, resets at ${resetAt}`
+          );
+        } else {
+          core2.info("[debug] Token verified successfully");
+        }
+      } catch {
+        core2.info("[debug] Token verified successfully");
+      }
+    }
   } catch (err) {
     const e = err;
     throw new GhApiError("/rate_limit", e.stderr ?? "", e.exitCode ?? -1);
   }
 }
 async function ghApiList(endpoint, options = {}) {
-  const { env = {} } = options;
+  const { env = {}, debug } = options;
   const args = ["api", endpoint, "--paginate", "--jq", ".[]"];
+  if (debug) {
+    core2.info(`[debug] gh api ${endpoint} --paginate`);
+  }
   let stdout;
   try {
     const result = await execa("gh", args, {
@@ -31273,7 +31298,11 @@ async function ghApiList(endpoint, options = {}) {
     const e = err;
     throw new GhApiError(endpoint, e.stderr ?? e.message ?? "", e.exitCode ?? -1);
   }
-  return parseNdJson(stdout);
+  const items = parseNdJson(stdout);
+  if (debug) {
+    core2.info(`[debug] ${endpoint} \u2192 ${items.length.toString()} items`);
+  }
+  return items;
 }
 function parseNdJson(raw) {
   return raw.split("\n").filter((line) => line.trim().length > 0).map((line, index) => {
@@ -31288,14 +31317,16 @@ function parseNdJson(raw) {
 }
 
 // src/members.ts
+var core3 = __toESM(require_core(), 1);
 var OrgMemberSchema = external_exports.object({
   login: external_exports.string(),
   id: external_exports.number(),
   type: external_exports.string().default("User")
 });
-async function fetchOrgMembers(org, token, includeBots) {
+async function fetchOrgMembers(org, token, includeBots, debug) {
   const raw = await ghApiList(`/orgs/${org}/members`, {
-    env: { GH_TOKEN: token }
+    env: { GH_TOKEN: token },
+    debug
   });
   const members = [];
   const errors = [];
@@ -31313,11 +31344,22 @@ async function fetchOrgMembers(org, token, includeBots) {
 First offender: ${errors[0]}`
     );
   }
-  if (includeBots) return members;
-  return members.filter((m) => m.type !== "Bot");
+  if (includeBots) {
+    if (debug) core3.info(`[debug] Members fetched: ${members.length.toString()} (bots included)`);
+    return members;
+  }
+  const filtered = members.filter((m) => m.type !== "Bot");
+  if (debug) {
+    const botCount = members.length - filtered.length;
+    core3.info(
+      `[debug] Members fetched: ${members.length.toString()} total, ${botCount.toString()} bot(s) excluded \u2192 ${filtered.length.toString()} human members`
+    );
+  }
+  return filtered;
 }
 
 // src/auditlog.ts
+var core4 = __toESM(require_core(), 1);
 function getCutoffDate(days) {
   const date = /* @__PURE__ */ new Date();
   date.setDate(date.getDate() - days);
@@ -31334,22 +31376,31 @@ function buildAuditLogQuery(cutoff, phrases) {
   }
   return parts.join(" ");
 }
-async function fetchActiveActors(org, token, query) {
+async function fetchActiveActors(org, token, query, debug) {
   const endpoint = `/orgs/${org}/audit-log?phrase=${encodeURIComponent(query)}`;
   const events = await ghApiList(endpoint, {
-    env: { GH_TOKEN: token }
+    env: { GH_TOKEN: token },
+    debug
   });
   const actors = /* @__PURE__ */ new Set();
+  let eventsWithoutActor = 0;
   for (const event of events) {
     if (typeof event.actor === "string" && event.actor.length > 0) {
       actors.add(event.actor);
+    } else {
+      eventsWithoutActor++;
     }
+  }
+  if (debug) {
+    core4.info(
+      `[debug] Audit log: ${events.length.toString()} events \u2192 ${actors.size.toString()} unique actors` + (eventsWithoutActor > 0 ? ` (${eventsWithoutActor.toString()} events had no actor field)` : "")
+    );
   }
   return actors;
 }
 
 // src/outputs.ts
-var core2 = __toESM(require_core(), 1);
+var core5 = __toESM(require_core(), 1);
 function formatJson(users) {
   return JSON.stringify(
     users.map(({ login, id }) => ({ login, id })),
@@ -31362,9 +31413,9 @@ function formatCsv(users) {
   return ["login,id", ...rows].join("\n");
 }
 function setOutputs(dormantUsers) {
-  core2.setOutput("dormant-users-json", formatJson(dormantUsers));
-  core2.setOutput("dormant-users-csv", formatCsv(dormantUsers));
-  core2.setOutput("dormant-users-count", dormantUsers.length.toString());
+  core5.setOutput("dormant-users-json", formatJson(dormantUsers));
+  core5.setOutput("dormant-users-csv", formatCsv(dormantUsers));
+  core5.setOutput("dormant-users-count", dormantUsers.length.toString());
 }
 
 // src/index.ts
@@ -31372,45 +31423,43 @@ async function run() {
   try {
     const inputs = getInputs();
     const { org, token, days, phrases, includeBots, debug } = inputs;
-    await checkGhCli();
-    await verifyToken(token);
+    await checkGhCli(debug);
+    await verifyToken(token, debug);
     const cutoff = getCutoffDate(days);
     const query = buildAuditLogQuery(cutoff, phrases);
     if (debug) {
-      core3.startGroup("dormant-users-action: configuration");
-      core3.info(`Organization  : ${org}`);
-      core3.info(`Days look-back: ${days.toString()}`);
-      core3.info(`Cutoff date   : ${cutoff.toISOString().split("T")[0]}`);
-      core3.info(`Include bots  : ${includeBots.toString()}`);
-      core3.info(`Audit log query: ${query}`);
-      core3.endGroup();
+      core6.startGroup("dormant-users-action: configuration");
+      core6.info(`Organization   : ${org}`);
+      core6.info(`Days look-back : ${days.toString()}`);
+      core6.info(`Cutoff date    : ${cutoff.toISOString().split("T")[0]}`);
+      core6.info(`Include bots   : ${includeBots.toString()}`);
+      core6.info(
+        `Phrases        : ${phrases.length > 0 ? phrases.join(", ") : "(none \u2014 all events)"}`
+      );
+      core6.info(`Audit log query: ${query}`);
+      core6.endGroup();
     }
-    core3.info(`[1/3] Fetching organization members for ${org}...`);
-    const members = await fetchOrgMembers(org, token, includeBots);
-    if (debug) {
-      core3.info(`Total members (after bot filter): ${members.length.toString()}`);
-    }
-    core3.info("[2/3] Fetching audit log activity (this may take a moment for large orgs)...");
-    const activeActors = await fetchActiveActors(org, token, query);
-    if (debug) {
-      core3.startGroup("dormant-users-action: audit log results");
-      core3.info(`Unique active actors : ${activeActors.size.toString()}`);
-      core3.endGroup();
-    }
+    core6.info(`[1/3] Fetching organization members for ${org}...`);
+    const members = await fetchOrgMembers(org, token, includeBots, debug);
+    core6.info("[2/3] Fetching audit log activity (this may take a moment for large orgs)...");
+    const activeActors = await fetchActiveActors(org, token, query, debug);
     const dormantUsers = members.filter(({ login }) => !activeActors.has(login));
     if (debug) {
-      core3.startGroup("dormant-users-action: dormant users");
-      core3.info(`Dormant users : ${dormantUsers.length.toString()}`);
-      core3.info(`Active members: ${(members.length - dormantUsers.length).toString()}`);
-      core3.endGroup();
+      core6.startGroup("dormant-users-action: dormant users");
+      core6.info(`Active members : ${(members.length - dormantUsers.length).toString()}`);
+      core6.info(`Dormant members: ${dormantUsers.length.toString()}`);
+      if (dormantUsers.length > 0) {
+        core6.info(`Dormant logins : ${dormantUsers.map((u2) => u2.login).join(", ")}`);
+      }
+      core6.endGroup();
     }
-    core3.info(
+    core6.info(
       `[3/3] Done \u2014 ${dormantUsers.length.toString()} dormant / ${members.length.toString()} total members.`
     );
     setOutputs(dormantUsers);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    core3.setFailed(message);
+    core6.setFailed(message);
   }
 }
 void run();
