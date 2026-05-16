@@ -1,6 +1,6 @@
-import * as core from '@actions/core';
 import { z } from 'zod';
 import { ghApiList } from './github.js';
+import { log } from './logger.js';
 
 /** Zod schema for a single GitHub organization member returned by `GET /orgs/:org/members`. */
 export const OrgMemberSchema = z.object({
@@ -26,11 +26,9 @@ export async function fetchOrgMembers(
   org: string,
   token: string,
   includeBots: boolean,
-  debug?: boolean,
 ): Promise<OrgMember[]> {
   const raw = await ghApiList<unknown>(`/orgs/${org}/members`, {
     env: { GH_TOKEN: token },
-    debug,
   });
 
   const members: OrgMember[] = [];
@@ -53,17 +51,15 @@ export async function fetchOrgMembers(
   }
 
   if (includeBots) {
-    if (debug) core.info(`[debug] Members fetched: ${members.length.toString()} (bots included)`);
+    log(`Members fetched: ${members.length.toString()} (bots included)`);
     return members;
   }
 
   const filtered = members.filter((m) => m.type !== 'Bot');
-  if (debug) {
-    const botCount = members.length - filtered.length;
-    core.info(
-      `[debug] Members fetched: ${members.length.toString()} total, ` +
-        `${botCount.toString()} bot(s) excluded → ${filtered.length.toString()} human members`,
-    );
-  }
+  const botCount = members.length - filtered.length;
+  log(
+    `Members fetched: ${members.length.toString()} total, ` +
+      `${botCount.toString()} bot(s) excluded → ${filtered.length.toString()} human members`,
+  );
   return filtered;
 }

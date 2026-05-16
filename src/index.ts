@@ -4,14 +4,17 @@ import { checkGhCli, verifyToken } from './github.js';
 import { fetchOrgMembers } from './members.js';
 import { buildAuditLogQuery, getCutoffDate, fetchActiveActors } from './auditlog.js';
 import { setOutputs } from './outputs.js';
+import { initLogger } from './logger.js';
 
 async function run(): Promise<void> {
   try {
     const inputs = getInputs();
     const { org, token, days, phrases, includeBots, debug } = inputs;
 
-    await checkGhCli(debug);
-    await verifyToken(token, debug);
+    initLogger(debug);
+
+    await checkGhCli();
+    await verifyToken(token);
 
     const cutoff = getCutoffDate(days);
     const query = buildAuditLogQuery(cutoff, phrases);
@@ -30,10 +33,10 @@ async function run(): Promise<void> {
     }
 
     core.info(`[1/3] Fetching organization members for ${org}...`);
-    const members = await fetchOrgMembers(org, token, includeBots, debug);
+    const members = await fetchOrgMembers(org, token, includeBots);
 
     core.info('[2/3] Fetching audit log activity (this may take a moment for large orgs)...');
-    const activeActors = await fetchActiveActors(org, token, query, debug);
+    const activeActors = await fetchActiveActors(org, token, query);
 
     const dormantUsers = members.filter(({ login }) => !activeActors.has(login));
 

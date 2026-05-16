@@ -1,12 +1,10 @@
-import * as core from '@actions/core';
 import { execa } from 'execa';
+import { log } from './logger.js';
 
 /** Options for {@link ghApiList}. */
 export type GhApiListOptions = {
   /** Additional environment variables forwarded to the `gh` process. */
   env?: Record<string, string>;
-  /** When `true`, emits `core.info` lines describing the API call and result count. */
-  debug?: boolean;
 };
 
 /**
@@ -52,12 +50,10 @@ export class GhApiError extends Error {
  * Verifies that the GitHub CLI (`gh`) is installed and reachable in `PATH`.
  * @throws {Error} If `gh` is not found or exits with a non-zero status.
  */
-export async function checkGhCli(debug?: boolean): Promise<void> {
+export async function checkGhCli(): Promise<void> {
   try {
     const result = await execa('gh', ['--version']);
-    if (debug) {
-      core.info(`[debug] gh CLI found: ${result.stdout.split('\n')[0]}`);
-    }
+    log(`gh CLI found: ${result.stdout.split('\n')[0]}`);
   } catch {
     throw new Error(
       'GitHub CLI (gh) is not installed or not in PATH. ' +
@@ -75,30 +71,28 @@ export async function checkGhCli(debug?: boolean): Promise<void> {
  *
  * @throws {GhApiError} If the token is invalid or the request fails.
  */
-export async function verifyToken(token: string, debug?: boolean): Promise<void> {
+export async function verifyToken(token: string): Promise<void> {
   // /rate_limit works for PATs, OAuth tokens, and GitHub App installation
   // tokens alike. /user returns 403 for App tokens so cannot be used here.
   try {
     const result = await execa('gh', ['api', '/rate_limit'], {
       env: { ...process.env, GH_TOKEN: token },
     });
-    if (debug) {
-      try {
-        const data = JSON.parse(result.stdout) as {
-          rate?: { remaining: number; limit: number; reset: number };
-        };
-        const rate = data.rate;
-        if (rate) {
-          const resetAt = new Date(rate.reset * 1000).toISOString();
-          core.info(
-            `[debug] Token verified — rate limit: ${rate.remaining.toString()}/${rate.limit.toString()} remaining, resets at ${resetAt}`,
-          );
-        } else {
-          core.info('[debug] Token verified successfully');
-        }
-      } catch {
-        core.info('[debug] Token verified successfully');
+    try {
+      const data = JSON.parse(result.stdout) as {
+        rate?: { remaining: number; limit: number; reset: number };
+      };
+      const rate = data.rate;
+      if (rate) {
+        const resetAt = new Date(rate.reset * 1000).toISOString();
+        log(
+          `Token verified — rate limit: ${rate.remaining.toString()}/${rate.limit.toString()} remaining, resets at ${resetAt}`,
+        );
+      } else {
+        log('Token verified successfully');
       }
+    } catch {
+      log('Token verified successfully');
     }
   } catch (err: unknown) {
     const e = err as { stderr?: string; exitCode?: number };
@@ -116,13 +110,11 @@ export async function verifyToken(token: string, debug?: boolean): Promise<void>
  * @throws {Error} If any NDJSON line cannot be parsed as JSON.
  */
 export async function ghApiList<T>(endpoint: string, options: GhApiListOptions = {}): Promise<T[]> {
-  const { env = {}, debug } = options;
+  const { env = {} } = options;
 
   const args: string[] = ['api', endpoint, '--paginate', '--jq', '.[]'];
 
-  if (debug) {
-    core.info(`[debug] gh api ${endpoint} --paginate`);
-  }
+  log(`gh api ${endpoint} --paginate`);
 
   let stdout: string;
   try {
@@ -137,9 +129,7 @@ export async function ghApiList<T>(endpoint: string, options: GhApiListOptions =
   }
 
   const items = parseNdJson<T>(stdout);
-  if (debug) {
-    core.info(`[debug] ${endpoint} → ${items.length.toString()} items`);
-  }
+  log(`${endpoint} → ${items.length.toString()} items`);
   return items;
 }
 
