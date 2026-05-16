@@ -13,7 +13,6 @@ export function getInputs(): ValidatedInputs {
     token: core.getInput('token', { required: true }),
     days: core.getInput('days') || '90',
     includeBots: (core.getInput('include-bots') || 'false') as 'true' | 'false',
-    debug: (core.getInput('debug') || 'false') as 'true' | 'false',
     phrases: core.getInput('phrases') || undefined,
   };
 

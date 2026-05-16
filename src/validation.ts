@@ -41,12 +41,6 @@ export const InputSchema = z.object({
     })
     .transform((v) => v === 'true'),
 
-  debug: z
-    .enum(['true', 'false'], {
-      errorMap: () => ({ message: 'debug must be "true" or "false"' }),
-    })
-    .transform((v) => v === 'true'),
-
   phrases: z
     .string()
     .optional()

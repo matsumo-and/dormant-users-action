@@ -1,19 +1,12 @@
 import * as core from '@actions/core';
 
-let _enabled = false;
-
 /**
- * Configures the debug logger. Must be called once at action startup before
- * any module uses {@link log}.
- */
-export function initLogger(debug: boolean): void {
-  _enabled = debug;
-}
-
-/**
- * Emits a `[debug]`-prefixed info line when debug logging is enabled.
- * A no-op when {@link initLogger} was called with `false` (the default).
+ * Emits a debug log line via `core.debug()`.
+ *
+ * Output is visible when the `ACTIONS_STEP_DEBUG` secret is set to `true`, or
+ * when a workflow run is re-run with "Enable debug logging" checked in the
+ * GitHub UI. No custom `debug` input is required.
  */
 export function log(message: string): void {
-  if (_enabled) core.info(`[debug] ${message}`);
+  core.debug(message);
 }

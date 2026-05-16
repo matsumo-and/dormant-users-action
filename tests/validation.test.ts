@@ -6,7 +6,6 @@ const BASE = {
   token: 'ghp_xxxxxxxxxxxxxxxxxxxx',
   days: '90',
   includeBots: 'false' as const,
-  debug: 'false' as const,
 };
 
 describe('InputSchema — org', () => {
@@ -52,19 +51,15 @@ describe('InputSchema — days', () => {
   });
 });
 
-describe('InputSchema — includeBots / debug', () => {
+describe('InputSchema — includeBots', () => {
   it('transforms "true" to boolean true', () => {
-    const r = InputSchema.safeParse({ ...BASE, includeBots: 'true', debug: 'true' });
+    const r = InputSchema.safeParse({ ...BASE, includeBots: 'true' });
     expect(r.success).toBe(true);
-    if (r.success) {
-      expect(r.data.includeBots).toBe(true);
-      expect(r.data.debug).toBe(true);
-    }
+    if (r.success) expect(r.data.includeBots).toBe(true);
   });
 
   it('rejects non-boolean strings', () => {
     expect(InputSchema.safeParse({ ...BASE, includeBots: 'yes' }).success).toBe(false);
-    expect(InputSchema.safeParse({ ...BASE, debug: '1' }).success).toBe(false);
   });
 });
 

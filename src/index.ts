@@ -4,14 +4,11 @@ import { checkGhCli, verifyToken } from './github.js';
 import { fetchOrgMembers } from './members.js';
 import { buildAuditLogQuery, getCutoffDate, fetchActiveActors } from './auditlog.js';
 import { setOutputs } from './outputs.js';
-import { initLogger } from './logger.js';
 
 async function run(): Promise<void> {
   try {
     const inputs = getInputs();
-    const { org, token, days, phrases, includeBots, debug } = inputs;
-
-    initLogger(debug);
+    const { org, token, days, phrases, includeBots } = inputs;
 
     await checkGhCli();
     await verifyToken(token);
@@ -19,7 +16,7 @@ async function run(): Promise<void> {
     const cutoff = getCutoffDate(days);
     const query = buildAuditLogQuery(cutoff, phrases);
 
-    if (debug) {
+    if (core.isDebug()) {
       core.startGroup('dormant-users-action: configuration');
       core.info(`Organization   : ${org}`);
       core.info(`Days look-back : ${days.toString()}`);
@@ -40,7 +37,7 @@ async function run(): Promise<void> {
 
     const dormantUsers = members.filter(({ login }) => !activeActors.has(login));
 
-    if (debug) {
+    if (core.isDebug()) {
       core.startGroup('dormant-users-action: dormant users');
       core.info(`Active members : ${(members.length - dormantUsers.length).toString()}`);
       core.info(`Dormant members: ${dormantUsers.length.toString()}`);
